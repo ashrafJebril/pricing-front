@@ -1,6 +1,7 @@
+import { InputText } from "primereact/inputtext";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const ToolsHeader = ({ link }) => {
+const ToolsHeader = ({ link, searchFunc }) => {
   const location = useLocation();
   const navigate = useNavigate(); // Hook to programmatically navigate
 
@@ -20,11 +21,21 @@ const ToolsHeader = ({ link }) => {
   };
 
   return (
-    <div className="flex justify-between relative">
+    <div className="flex justify-between relative pb-5">
       <div className="text-indigo-800 font-bold text-xl mb-16">
         {headerName}
       </div>
-      <div className="absolute w-full flex justify-end mt-[3.7rem]">
+      <div className="absolute w-full flex justify-between mt-[3.7rem]">
+        <InputText
+          className="w-3/4 px-2 outline-none stroke-none"
+          onKeyDown={(event) => {
+            if (event.key.toLowerCase() == "enter") {
+              searchFunc(event.target.value);
+            }
+          }}
+          type="search"
+          placeholder="Search..."
+        ></InputText>
         <button
           className="bg-indigo-800 rounded w-48 h-8 text-white"
           onClick={handleAddClick} // Attach the navigation function

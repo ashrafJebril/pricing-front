@@ -37,10 +37,7 @@ export const auth = {
         email: credentials.email,
         password: credentials.password,
       });
-      console.log("data", response);
       if (response.accessToken) {
-        console.log("response", response);
-
         // Update state
         dispatch.auth.setAuth({
           isAuthenticated: true,

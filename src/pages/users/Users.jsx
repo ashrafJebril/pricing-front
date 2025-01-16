@@ -1,7 +1,7 @@
 import Table from "../../components/shared/Table";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../hooks/toast";
-
+import ToolsHeader from "../../components/shared/ToolsHeader";
 const Users = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -91,6 +91,7 @@ const Users = () => {
 
   return (
     <div>
+      <ToolsHeader link={link} />
       <Table columns={columns} data={data} link={link} />
     </div>
   );

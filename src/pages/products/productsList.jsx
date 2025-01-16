@@ -98,10 +98,13 @@ const Users = () => {
       body: (rowData) => <ActionColumn row={rowData} />,
     },
   ];
+  const searchFunc = async (data) => {
+    dispatch.productsStore.fetchProducts({ page: 1, rows: 10, search: data });
+  };
 
   return (
     <div>
-      <ToolsHeader link={link} />
+      <ToolsHeader searchFunc={searchFunc} link={link} />
 
       <Table
         columns={columns}

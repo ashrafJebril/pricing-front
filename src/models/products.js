@@ -33,10 +33,10 @@ export const productsStore = {
     },
   },
   effects: (dispatch) => ({
-    async fetchProducts({ page = 1, rows = 10 }) {
+    async fetchProducts({ page = 1, rows = 10, search }) {
       dispatch.productsStore.setLoading(true);
       try {
-        const response = await apigetProducts({ page, rows });
+        const response = await apigetProducts({ page, rows, search });
         const { data, metadata } = response;
 
         dispatch.productsStore.setProducts({

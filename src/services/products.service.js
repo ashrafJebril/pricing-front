@@ -1,14 +1,17 @@
 import axiosInstance from "./axios.Service";
 
-export const apigetProducts = async ({ page = 1 }) => {
+export const apigetProducts = async ({ page = 1, search }) => {
   console.log("Fetching products with pagination:", { page });
   try {
     // Retrieve the access token from local storage
     const accessToken = localStorage.getItem("auth");
     const parsed = JSON.parse(accessToken);
-
+    const params = { page };
+    if (search) {
+      params['search'] = search;
+    }
     const response = await axiosInstance.get("products", {
-      params: { page },
+      params,
       headers: {
         Authorization: `Bearer ${parsed.user.accessToken}`, // Include the token in the Authorization header
       },
