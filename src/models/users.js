@@ -16,7 +16,7 @@ export const usersStore = {
       console.log("asfas", payload);
       return {
         ...state,
-        users: payload.response,
+        users: payload.data,
         pagination: {
           currentPage: payload.currentPage,
           totalPages: payload.totalPages,
@@ -39,13 +39,13 @@ export const usersStore = {
       try {
         const response = await apigetUsers({ page, rows });
 
-        console.log("datasfasga", response);
+        const { data, metadata } = response;
         dispatch.usersStore.setusers({
-          response,
-          //   currentPage: metadata.currentPage,
-          //   totalPages: metadata.totalPages,
-          //   totalItems: metadata.totalItems,
-          //   pageSize: rows,
+          data,
+          currentPage: metadata.currentPage,
+          totalPages: metadata.totalPages,
+          totalItems: metadata.totalItems,
+          pageSize: rows,
         });
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -60,5 +60,4 @@ export const usersStore = {
       }
     },
   }),
-  
 };
