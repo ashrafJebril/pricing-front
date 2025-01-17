@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 
-const ToolsHeader = ({ link }) => {
+const ToolsHeader = ({ link = "" }) => {
   const location = useLocation();
   const navigate = useNavigate(); // Hook to programmatically navigate
 

@@ -13,6 +13,7 @@ import AddProduct from "./pages/products/addProduct";
 import Customers from "./pages/customers/customersList";
 import AddCustomer from "./pages/customers/customersAdd";
 import GenerateQuote from "./pages/qoutes/generateQuote";
+import QuotesList from "./pages/qoutes/quotesList";
 
 import EditUser from "./pages/users/EditUser";
 import "primereact/resources/themes/saga-blue/theme.css"; // Choose your theme
@@ -46,8 +47,8 @@ function AppRoutes() {
         <Route path="products/add-product" element={<AddProduct />} />
         <Route path="products" element={<Products></Products>} />
         <Route path="customers" element={<Customers />} />
-        <Route path="quotes" element={<GenerateQuote />} />
-
+        <Route path="quotes/generate" element={<GenerateQuote />} />
+        <Route path="quotes/list" element={<QuotesList />} />
         <Route path="customers/add-customer" element={<AddCustomer />} />
 
         <Route path="settings" element={<div>Settings Page</div>} />

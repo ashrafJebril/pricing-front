@@ -1,97 +1,138 @@
+import React, { useEffect } from "react";
 import Table from "../../components/shared/Table";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../hooks/toast";
-
+import { useSelector, useDispatch } from "react-redux";
+import ToolsHeader from "../../components/shared/ToolsHeader";
+import { apiDeleteProduct } from "../../services/products.service";
 const Users = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { showToast } = useToast();
-  const handleSuccess = () => {
-    showToast("error", "Error", "An error occurred during the operation.");
-    showToast("success", "Success", "The operation was successful!");
-  };
-  const link = "add-user";
-  const onEdit = (row) => {
-    console.log("Edit row:", row);
-    navigate(`/users/edit-user`);
-    // navigate(`/app/company/company-edit/${row.uuid}`);
-  };
 
-  const onCopy = (row) => {
-    console.log("Copy row:", row);
-    // navigate(`/app/company/company-copy/${row.uuid}`);
-  };
-
-  const onDelete = (row) => {
-    handleSuccess();
-    console.log("Delete row:", row);
-    // dispatch(toggleDeleteConfirmation(true));
-    // dispatch(setSelectedCompany(row.uuid));
-  };
-
-  const ActionColumn = ({ row }) => (
-    <div className="flex justify-end text-lg">
-      <span
-        className="cursor-pointer p-2 hover:text-emerald-500"
-        onClick={() => onEdit(row)}
-      >
-        <i className="pi pi-pencil" /> {/* Edit */}
-      </span>
-      <span
-        className="cursor-pointer p-2 hover:text-amber-500"
-        onClick={() => onCopy(row)}
-      >
-        <i className="pi pi-copy" /> {/* Copy */}
-      </span>
-      <span
-        className="cursor-pointer p-2 hover:text-red-500"
-        onClick={() => onDelete(row)}
-      >
-        <i className="pi pi-trash" /> {/* Delete */}
-      </span>
-    </div>
+  // Select data from the Redux store
+  const { users, pagination, loading, totalItems } = useSelector(
+    (state) => state.usersStore
   );
 
-  const columns = [
-    { field: "name", header: "Name", style: { width: "25%" } },
-    { field: "country.name", header: "Country", style: { width: "25%" } },
-    { field: "company", header: "Company", style: { width: "25%" } },
-    {
-      field: "representative.name",
-      header: "Representative",
-      style: { width: "25%" },
-    },
-    {
-      style: { width: "25%" },
-      header: "",
-      headerStyle: { textAlign: "right" }, // Center the header
-      body: (rowData) => <ActionColumn row={rowData} />,
-    },
-  ];
+  // Fetch products on component mount
 
-  const data = [
+  useEffect(() => {
+    dispatch.usersStore.fetchUsers({ page: 1, rows: 10 });
+  }, [dispatch]);
+
+  const changePage = (payload) => {
+    console.log(payload);
+    dispatch.usersStore.fetchUsers({
+      page: payload.page + 1,
+      rows: payload.rows,
+    });
+  };
+
+  const link = "add-user";
+
+  const ActionColumn = ({ row }) => {
+    const navigate = useNavigate();
+
+    const onEdit = (e) => {
+      e.stopPropagation();
+      navigate(`/app/warehouses/warehouse-edit/${row.uuid}`);
+    };
+
+    const onCopy = (e) => {
+      e.stopPropagation();
+      navigate(`/app/warehouses/warehouse-copy/${row.uuid}`);
+    };
+
+    const onDelete = async (e) => {
+      e.stopPropagation();
+      await apiDeleteProduct(row.id);
+      dispatch.usersStore.fetchProducts({ page: 1, rows: 10 });
+      showToast("success", "Success", "Product deleted successfuly");
+    };
+
+    return (
+      <div className="flex justify-end text-lg">
+        <span
+          className="cursor-pointer p-2 hover:text-emerald-500"
+          onClick={onEdit}
+        >
+          <i className="pi pi-pencil" />
+        </span>
+        <span
+          className="cursor-pointer p-2 hover:text-amber-500"
+          onClick={onCopy}
+        >
+          <i className="pi pi-copy" />
+        </span>
+        <span
+          className="cursor-pointer p-2 hover:text-red-500"
+          onClick={onDelete}
+        >
+          <i className="pi pi-trash" />
+        </span>
+      </div>
+    );
+  };
+  const columns = [
     {
-      name: "John Doe",
-      country: { name: "USA" },
-      company: "Tech Corp",
-      representative: { name: "Jane Smith" },
+      field: "email",
+      header: "Email",
+      style: { width: "15%" },
+    },
+    { field: "fullName", header: "Full name", style: { width: "35%" } },
+
+    {
+      field: "phoneNumber",
+      header: "Mobile",
+      style: { width: "10%" },
     },
     {
-      name: "Alice Johnson",
-      country: { name: "UK" },
-      company: "Innovate Ltd",
-      representative: { name: "Robert Brown" },
+      field: "role",
+      header: "Role",
+      style: { width: "10%" },
+      body: (rowData) =>
+        rowData.role === "ADMIN" ? (
+          <span className="bg-green-200 rounded-lg px-6 p-1 text-green-600">
+            Admin
+          </span>
+        ) : (
+          <span className="bg-yellow-200 rounded-lg px-6 p-1 text-yellow-600">
+            User
+          </span>
+        ),
+    },
+
+    {
+      field: "isActive",
+      header: "Status",
+      style: { width: "10%" },
+      body: (rowData) =>
+        rowData.isActive ? (
+          <span className="text-green-600">Active</span>
+        ) : (
+          <span className="text-red-600">Inactive</span>
+        ),
     },
     {
-      name: "Bob Lee",
-      country: { name: "Australia" },
-      company: "BuildWorks",
-      representative: { name: "Emily Davis" },
+      style: { width: "10%" },
+      header: "",
+      headerStyle: { textAlign: "right" },
+      body: (rowData) => <ActionColumn row={rowData} />,
     },
   ];
 
   return (
     <div>
-      <Table columns={columns} data={data} link={link} />
+      <ToolsHeader link={link} />
+
+      <Table
+        columns={columns}
+        totalRecords={pagination}
+        data={users}
+        changePage={changePage} // Pass the page change handler
+        link={link}
+      />
     </div>
   );
 };

@@ -4,6 +4,8 @@ import { dashboard } from "./models/dashboard";
 import { productsStore } from "./models/products";
 import { customersStore } from "./models/customers";
 import { quotesStore } from "./models/quotes";
+import { usersStore } from "./models/users";
+
 const store = init({
   models: {
     auth,
@@ -11,6 +13,7 @@ const store = init({
     productsStore,
     customersStore,
     quotesStore,
+    usersStore,
   },
 });
 

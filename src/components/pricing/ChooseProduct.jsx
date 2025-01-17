@@ -1,43 +1,52 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
+import { apiDeleteProduct } from "../../services/products.service";
+import { useToast } from "../../hooks/toast";
 
 const Pricing = () => {
+  const { showToast } = useToast();
+
   const dispatch = useDispatch();
   const { quotes } = useSelector((state) => state.quotesStore);
-  const [searchTerm, setSearchTerm] = useState("");
   const { products, pagination, loading, totalItems } = useSelector(
     (state) => state.productsStore
   );
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [showSlide, setShowSlide] = useState(false);
-
-  useEffect(() => {
-    if (!searchTerm) {
-      dispatch.productsStore.fetchProducts({ page: 1, rows: 10 });
-    }
-  }, [dispatch, searchTerm]);
 
   useEffect(() => {
     console.log("quotes", quotes);
   }, [quotes]);
 
+  useEffect(() => {
+    dispatch.productsStore.fetchProducts({ page: 1, rows: 10 });
+  }, [dispatch]);
+
+  const [showSlide, setShowSlide] = useState(false);
+
   const ActionColumn = ({ row }) => {
     const navigate = useNavigate();
 
-    const onEdit = () => {
+    const onEdit = (e) => {
+      e.stopPropagation();
       navigate(`/app/warehouses/warehouse-edit/${row.uuid}`);
     };
 
-    const onCopy = () => {
+    const onCopy = (e) => {
+      e.stopPropagation();
       navigate(`/app/warehouses/warehouse-copy/${row.uuid}`);
     };
 
-    const onDelete = () => {};
+    const onDelete = async (e) => {
+      e.stopPropagation();
+      await apiDeleteProduct(row.id);
+      dispatch.productsStore.fetchProducts({ page: 1, rows: 10 });
+      showToast("success", "Success", "Product deleted successfuly");
+    };
 
     return (
       <div className="flex justify-end text-lg">
@@ -64,87 +73,32 @@ const Pricing = () => {
   };
 
   const columns = [
-    {
-      header: "Description",
-      field: "description",
-      id: "description",
-      sortable: true,
-      checked: true,
-      body: (rowData) => rowData.description,
-    },
-    {
-      header: "Catalog Number",
-      field: "catalogNumber",
-      id: "catalogNumber",
-      sortable: true,
-      checked: true,
-      body: (rowData) => rowData.catalogNumber,
-    },
-    {
-      header: "Uom",
-      field: "uom",
-      id: "uom",
-      sortable: true,
-      checked: true,
-      body: (rowData) => rowData.uom,
-    },
-    {
-      header: "Product Group",
-      field: "productGroup",
-      id: "productGroup",
-      sortable: true,
-      checked: true,
-      body: (rowData) => rowData.productGroup,
-    },
-    {
-      header: "Quantity Break",
-      field: "quantityBreak",
-      id: "quantityBreak",
-      sortable: true,
-      checked: true,
-      body: (rowData) => rowData.quantityBreak,
-    },
-    {
-      header: "Us List Price2025",
-      field: "usListPrice2025",
-      id: "usListPrice2025",
-      sortable: true,
-      checked: true,
-      body: (rowData) => rowData.usListPrice2025,
-    },
+    { header: "Description", field: "description", sortable: true },
+    { header: "Catalog Number", field: "catalogNumber", sortable: true },
+    { header: "Uom", field: "uom", sortable: true },
+    { header: "Product Group", field: "productGroup", sortable: true },
+    { header: "Quantity Break", field: "quantityBreak", sortable: true },
+    { header: "Us List Price2025", field: "usListPrice2025", sortable: true },
   ];
 
   const selectRows = (e) => {
-    // Log the selected rows (e.value)
-    console.log(e.value);
-
-    // Update local state with the selected rows
-    setSelectedRows(e.value);
-    console.log("updatedSelectedRows", selectedRows);
-    // Dispatch the action to update the Redux store with the selected rows
-    dispatch.quotesStore.saveQuotes({ products: selectedRows });
+    const selectedProducts = e.value; // Rows currently selected
+    dispatch.quotesStore.updateSelectedProducts(selectedProducts);
   };
 
-  const handleRemoveProduct = (product) => {
-    // Remove the product from the local selected rows state
-    const updatedSelectedRows = selectedRows.filter(
-      (item) => item.id !== product.id
+  const handleRemoveProduct = (productToRemove) => {
+    const updatedProducts = quotes.products.filter(
+      (product) => product.id !== productToRemove.id
     );
-
-    setSelectedRows(updatedSelectedRows); // Update the local state
-
-    // Dispatch the action to update the store with the removed product
-    dispatch.quotesStore.saveQuotes({
-      products: updatedSelectedRows, // Update store with the new selected rows
-    });
+    dispatch.quotesStore.updateSelectedProducts(updatedProducts);
   };
 
   return (
     <div className="p-6 space-y-6 mx-auto relative">
       <DataTable
         value={products}
-        selection={selectedRows}
-        onSelectionChange={(e) => selectRows(e)}
+        selection={quotes.products}
+        onSelectionChange={selectRows}
         dataKey="id"
         paginator
         rows={pagination.pageSize}
@@ -152,31 +106,21 @@ const Pricing = () => {
         loading={loading}
         className="p-datatable-gridlines"
       >
-        <Column
-          selectionMode="multiple"
-          header="Select"
-          style={{ width: "3em" }}
-        />
+        <Column selectionMode="multiple" header="" style={{ width: "3em" }} />
         {columns.map((col) => (
           <Column
-            key={col.id}
+            key={col.field}
             header={col.header}
             field={col.field}
             sortable={col.sortable}
-            body={col.body}
           />
         ))}
         <Column body={(row) => <ActionColumn row={row} />} />
       </DataTable>
-
       {!loading && products.length === 0 && (
-        <p className="text-gray-500 text-center">
-          No products found for the search term.
-        </p>
+        <p className="text-gray-500 text-center">No products found.</p>
       )}
-
-      {/* Slide-In Menu with Selected Products */}
-      {selectedRows.length > 0 && (
+      {quotes.products.length > 0 && (
         <div className="fixed top-0 right-0 h-full flex items-start">
           <div
             className={`h-12 flex items-center cursor-pointer absolute right-0 transition-transform duration-300 bg-white shadow-md rounded-l-lg ${
@@ -208,7 +152,7 @@ const Pricing = () => {
               </div>
 
               <div className="space-y-3">
-                {selectedRows.map((product) => (
+                {quotes.products.map((product) => (
                   <div
                     key={product.id}
                     className="flex items-center justify-between bg-gray-50 p-3 rounded-lg shadow-sm"

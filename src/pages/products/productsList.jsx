@@ -31,47 +31,49 @@ const Users = () => {
 
   const link = "add-product";
 
-  const onEdit = (row) => {
-    navigate(`/users/edit-user`);
+  const ActionColumn = ({ row }) => {
+    const navigate = useNavigate();
+
+    const onEdit = (e) => {
+      e.stopPropagation();
+      navigate(`/app/warehouses/warehouse-edit/${row.uuid}`);
+    };
+
+    const onCopy = (e) => {
+      e.stopPropagation();
+      navigate(`/app/warehouses/warehouse-copy/${row.uuid}`);
+    };
+
+    const onDelete = async (e) => {
+      e.stopPropagation();
+      await apiDeleteProduct(row.id);
+      dispatch.productsStore.fetchProducts({ page: 1, rows: 10 });
+      showToast("success", "Success", "Product deleted successfuly");
+    };
+
+    return (
+      <div className="flex justify-end text-lg">
+        <span
+          className="cursor-pointer p-2 hover:text-emerald-500"
+          onClick={onEdit}
+        >
+          <i className="pi pi-pencil" />
+        </span>
+        <span
+          className="cursor-pointer p-2 hover:text-amber-500"
+          onClick={onCopy}
+        >
+          <i className="pi pi-copy" />
+        </span>
+        <span
+          className="cursor-pointer p-2 hover:text-red-500"
+          onClick={onDelete}
+        >
+          <i className="pi pi-trash" />
+        </span>
+      </div>
+    );
   };
-
-  const onCopy = (row) => {
-    console.log("Copy row:", row);
-  };
-
-  const onDelete = async (row) => {
-    3;
-    const response = await apiDeleteProduct(row.id); // Pass the product ID to delete
-    dispatch.productsStore.fetchProducts({
-      page: pagination.currentPage,
-      rows: 10,
-    });
-    showToast("success", "Deleted", "Row deleted successfully.");
-  };
-
-  const ActionColumn = ({ row }) => (
-    <div className="flex justify-end text-lg">
-      <span
-        className="cursor-pointer p-2 hover:text-emerald-500"
-        onClick={() => onEdit(row)}
-      >
-        <i className="pi pi-pencil" />
-      </span>
-      <span
-        className="cursor-pointer p-2 hover:text-amber-500"
-        onClick={() => onCopy(row)}
-      >
-        <i className="pi pi-copy" />
-      </span>
-      <span
-        className="cursor-pointer p-2 hover:text-red-500"
-        onClick={() => onDelete(row)}
-      >
-        <i className="pi pi-trash" />
-      </span>
-    </div>
-  );
-
   const columns = [
     {
       field: "catalogNumber",
