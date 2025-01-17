@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "../../hooks/toast";
 import { useSelector, useDispatch } from "react-redux";
 import ToolsHeader from "../../components/shared/ToolsHeader";
-import { apiDeleteProduct } from "../../services/products.service";
+import { apiDeleteCustomers } from "../../services/customers.service";
 const Users = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -41,12 +41,12 @@ const Users = () => {
 
   const onDelete = async (row) => {
     3;
-    const response = await apiDeleteProduct(row.id); // Pass the product ID to delete
-    dispatch.customersStore.fetchProducts({
+    const response = await apiDeleteCustomers(row.id); // Pass the product ID to delete
+    dispatch.customersStore.fetchCustomers({
       page: pagination.currentPage,
       rows: 10,
     });
-    showToast("success", "Deleted", "Row deleted successfully.");
+    showToast("success", "Deleted", "Customer deleted successfully.");
   };
 
   const ActionColumn = ({ row }) => (

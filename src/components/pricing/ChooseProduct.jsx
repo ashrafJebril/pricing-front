@@ -8,7 +8,7 @@ import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
 import { apiDeleteProduct } from "../../services/products.service";
 import { useToast } from "../../hooks/toast";
-
+import { InputText } from "primereact/inputtext";
 const Pricing = () => {
   const { showToast } = useToast();
 
@@ -18,9 +18,6 @@ const Pricing = () => {
     (state) => state.productsStore
   );
 
-  useEffect(() => {
-    console.log("quotes", quotes);
-  }, [quotes]);
 
   useEffect(() => {
     dispatch.productsStore.fetchProducts({ page: 1, rows: 10 });
@@ -92,9 +89,46 @@ const Pricing = () => {
     );
     dispatch.quotesStore.updateSelectedProducts(updatedProducts);
   };
-
+  const [canClearSearch, setCanClearSearch] = useState(false);
+  const [search, setSearch] = useState("");
+  const handleSearch = () => {
+    setCanClearSearch(true);
+    dispatch.productsStore.fetchProducts({
+      page: 1,
+      rows: 10000,
+      search,
+    });
+  };
   return (
     <div className="p-6 space-y-6 mx-auto relative">
+      <div className="w-3/4 flex justify-start items-center">
+        <InputText
+          value={search}
+          className="w-3/4 px-2 outline-none stroke-none"
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(event) => {
+            if (event.key.toLowerCase() == "enter") {
+              handleSearch();
+            }
+          }}
+          type="text"
+          placeholder="Search..."
+        ></InputText>
+        {canClearSearch && (
+          <i
+            className="p-2 pi pi-times text-red-600 cursor-pointer "
+            onClick={() => {
+              setCanClearSearch(false);
+              setSearch("");
+              dispatch.productsStore.fetchProducts({
+                page: 1,
+                rows: 10,
+                search: event.target.value,
+              });
+            }}
+          ></i>
+        )}
+      </div>
       <DataTable
         value={products}
         selection={quotes.products}

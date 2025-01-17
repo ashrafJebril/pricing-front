@@ -1,11 +1,7 @@
 import { InputText } from "primereact/inputtext";
 import { useLocation, useNavigate } from "react-router-dom";
 
-<<<<<<< HEAD
-const ToolsHeader = ({ link = "" }) => {
-=======
 const ToolsHeader = ({ link, searchFunc }) => {
->>>>>>> df3a81fe79aa14fcbc33b62e186e8642e1af7262
   const location = useLocation();
   const navigate = useNavigate(); // Hook to programmatically navigate
 

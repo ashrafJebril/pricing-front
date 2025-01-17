@@ -15,7 +15,7 @@ function AddUserForm() {
 
   const onSubmit = async (data) => {
     console.log("Form Data Submitted:", data);
-    await dispatch.users.createNewUser(data);
+    await dispatch.usersStore.createNewUser(data);
     showToast("success", "Success", "User added successfully");
     navigate("/users");
     };
