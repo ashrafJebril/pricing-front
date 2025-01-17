@@ -1,16 +1,24 @@
+import React from "react";
 import { useForm } from "react-hook-form";
-
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "../../../hooks/toast";
 function AddUserForm() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log("Form Data Submitted:", data);
-    alert("User added successfully!");
-  };
+    await dispatch.users.createNewUser(data);
+    showToast("success", "Success", "User added successfully");
+    navigate("/users");
+    };
 
   return (
     <div className="max-w-md mx-auto p-6 border rounded-lg shadow-md bg-white">
@@ -29,14 +37,14 @@ function AddUserForm() {
           <input
             id="name"
             type="text"
-            className={`mt-1 block h-8 w-full rounded-md border px-1${
-              errors.name ? "border-red-500" : "border-gray-300"
+            className={`mt-1 px-1 block h-8 w-full rounded-md border px-1${
+              errors.fullName ? "border-red-500" : "border-gray-300"
             } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm`}
-            {...register("name", { required: "Name is required" })}
+            {...register("fullName", { required: "Name is required" })}
           />
-          {errors.name && (
+          {errors.fullName && (
             <p className="absolute -bottom-5 left-0 text-sm text-red-500">
-              {errors.name.message}
+              {errors.fullName.message}
             </p>
           )}
         </div>
@@ -96,6 +104,28 @@ function AddUserForm() {
             </p>
           )}
         </div>
+        {/* Name Field */}
+        <div className="relative mb-6">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Phone:
+          </label>
+          <input
+            id="phoneNumber:"
+            type="tel"
+            className={`mt-1 px-1 block h-8 w-full rounded-md border px-1${
+              errors.phoneNumber ? "border-red-500" : "border-gray-300"
+            } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm`}
+            {...register("phoneNumber", { required: "Name is required" })}
+          />
+          {errors.phoneNumber && (
+            <p className="absolute -bottom-5 left-0 text-sm text-red-500">
+              {errors.phoneNumber.message}
+            </p>
+          )}
+        </div>
 
         {/* Role Dropdown */}
         <div className="relative mb-6">
@@ -112,8 +142,8 @@ function AddUserForm() {
             {...register("role", { required: "Role is required" })}
           >
             <option value="">Select Role</option>
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
+            <option value="ADMIN">Admin</option>
+            <option value="USER">User</option>
           </select>
           {errors.role && (
             <p className="absolute -bottom-5 left-0 text-sm text-red-500">

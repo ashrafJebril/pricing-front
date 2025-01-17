@@ -9,8 +9,10 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
+import { useSelector, useDispatch } from "react-redux";
 
 const navigation = [
+<<<<<<< HEAD
   { name: "Users", to: "/users", icon: UsersIcon },
   { name: "Products", to: "/products", icon: ShoppingBagIcon },
   { name: "Customers", to: "/customers", icon: UserGroupIcon },
@@ -37,6 +39,17 @@ export default function Sidebar({ isExpanded, toggleSidebar }) {
     );
   };
 
+=======
+  { role: "ADMIN", name: "Users", to: "/users", icon: UsersIcon },
+  { role: "ADMIN", name: "Products", to: "/products", icon: ShoppingBagIcon },
+  { role: "ADMIN", name: "Customers", to: "/customers", icon: UserGroupIcon },
+  { role: "ADMIN", name: "Settings", to: "/settings", icon: Cog6ToothIcon },
+  { role: "USER", name: "Quotes", to: "/quotes", icon: Cog6ToothIcon },
+];
+
+export default function Sidebar({ isExpanded, toggleSidebar }) {
+  const user = useSelector((state) => state.auth.user);
+>>>>>>> df3a81fe79aa14fcbc33b62e186e8642e1af7262
   return (
     <div
       className={`${
@@ -55,6 +68,7 @@ export default function Sidebar({ isExpanded, toggleSidebar }) {
         </button>
       </div>
       <nav className="mt-4">
+<<<<<<< HEAD
         {navigation.map((item) => (
           <div key={item.name} className="mb-2">
             {/* Handle expandable menu */}
@@ -117,6 +131,26 @@ export default function Sidebar({ isExpanded, toggleSidebar }) {
             )}
           </div>
         ))}
+=======
+        {navigation
+          .filter(
+            (item) => user.user.role == "ADMIN" || item.role == user.user.role
+          )
+          .map((item) => (
+            <NavLink
+              key={item.name}
+              to={item.to}
+              className={({ isActive }) =>
+                `sidebar-link ${isActive ? "active" : ""} ${
+                  isExpanded ? "px-4" : "px-2 justify-center"
+                }`
+              }
+            >
+              <item.icon className="w-5 h-5" />
+              {isExpanded && <span>{item.name}</span>}
+            </NavLink>
+          ))}
+>>>>>>> df3a81fe79aa14fcbc33b62e186e8642e1af7262
       </nav>
     </div>
   );
