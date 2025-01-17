@@ -8,10 +8,13 @@ import {
   Bars3Icon,
   ChevronDownIcon,
   ChevronUpIcon,
+  ChartPieIcon
 } from "@heroicons/react/24/outline";
+
 import { useSelector, useDispatch } from "react-redux";
 
 const navigation = [
+  {role: "ADMIN", name: "Dashboard", to: "/dashboard", icon: ChartPieIcon },
   {role: "ADMIN", name: "Users", to: "/users", icon: UsersIcon },
   {role: "ADMIN", name: "Products", to: "/products", icon: ShoppingBagIcon },
   {role: "ADMIN", name: "Customers", to: "/customers", icon: UserGroupIcon },
